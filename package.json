@@ -14,6 +14,7 @@
     "@react-native-seoul/masonry-list": "^1.4.2",
     "@react-navigation/native": "^6.1.16",
     "@react-navigation/native-stack": "^6.9.25",
+    "axios": "^1.6.8",
     "nativewind": "^2.0.11",
     "react": "18.2.0",
     "react-native": "0.73.6",
