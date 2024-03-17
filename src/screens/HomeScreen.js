@@ -1,10 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
 import {StatusBar, Text, View, ScrollView, TextInput} from 'react-native';
-import {
-  //   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
+import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import {
   BellIcon,
   UserCircleIcon,
@@ -12,13 +10,16 @@ import {
 } from 'react-native-heroicons/outline';
 import Categories from '../components/categories';
 import axios from 'axios';
+import Recipes from '../components/recipes';
 
 const HomeScreen = () => {
   const [activeCategory, setActiveCategory] = useState('Beef');
+  const [meals, setMeals] = useState([]);
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     getCategories();
+    getMeals();
   }, []);
 
   const getCategories = async () => {
@@ -32,6 +33,25 @@ const HomeScreen = () => {
     } catch (e) {
       console.log(e, 'error fetching categories');
     }
+  };
+
+  const getMeals = async (category = 'Beef') => {
+    try {
+      const response = await axios.get(
+        `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`,
+      );
+      if (response && response.data) {
+        setMeals(response.data.meals);
+      }
+    } catch (e) {
+      console.log(e, 'error fetching recipes');
+    }
+  };
+
+  const handleChangeCategory = category => {
+    getMeals(category);
+    setActiveCategory(category);
+    setMeals([]);
   };
 
   return (
@@ -81,14 +101,20 @@ const HomeScreen = () => {
           </View>
         </View>
 
+        {/* Categories */}
         <View>
           {categories.length > 0 && (
             <Categories
               categories={categories}
               activeCategory={activeCategory}
-              setActiveCategory={setActiveCategory}
+              handleChangeCategory={handleChangeCategory}
             />
           )}
+        </View>
+
+        {/* Recipes */}
+        <View>
+          <Recipes meals={meals} categories={categories} />
         </View>
       </ScrollView>
     </View>
