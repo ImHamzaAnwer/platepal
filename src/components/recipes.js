@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, Text, Pressable, Image} from 'react-native';
+import {View, Text, Pressable} from 'react-native';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import MasonryList from '@react-native-seoul/masonry-list';
 import Animated, {FadeInDown} from 'react-native-reanimated';
@@ -54,7 +54,8 @@ const RecipeCard = ({item, index, navigation}) => {
           paddingRight: isEven ? 8 : 0,
         }}
         className="flex justify-center mb-4 space-y-1">
-        <Image
+        <Animated.Image
+          sharedTransitionTag={item.strMeal}
           source={{uri: item.strMealThumb}}
           style={{
             width: '100%',

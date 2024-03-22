@@ -5,7 +5,6 @@ import {
   Text,
   ScrollView,
   StatusBar,
-  Image,
   TouchableOpacity,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
@@ -23,6 +22,8 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import Loading from '../components/loading';
+import YoutubeIframe from 'react-native-youtube-iframe';
+import Animated, {FadeIn, FadeInDown} from 'react-native-reanimated';
 
 export default function RecipeDetailScreen(props) {
   const navigation = useNavigation();
@@ -49,6 +50,31 @@ export default function RecipeDetailScreen(props) {
     }
   };
 
+  function extractYouTubeVideoId(url) {
+    const pattern =
+      /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const match = url.match(pattern);
+    if (match) {
+      return match[1]; // Return the first capturing group
+    } else {
+      return null; // Return null if no match is found
+    }
+  }
+
+  const ingredientsIndexes = meal => {
+    if (!meal) {
+      return [];
+    }
+    let indexes = [];
+    for (let i = 1; i <= 20; i++) {
+      if (meal['strIngredient' + i]) {
+        indexes.push(i);
+      }
+    }
+
+    return indexes;
+  };
+
   const item = props.route.params;
   return (
     <ScrollView
@@ -57,7 +83,8 @@ export default function RecipeDetailScreen(props) {
       contentContainerStyle={{paddingBottom: 30}}>
       <StatusBar barStyle={'dark-content'} />
       <View className="flex-row justify-center">
-        <Image
+        <Animated.Image
+          sharedTransitionTag={item.strMeal}
           source={{uri: item.strMealThumb}}
           style={{
             width: wp(98),
@@ -70,7 +97,9 @@ export default function RecipeDetailScreen(props) {
         />
       </View>
 
-      <View className="w-full absolute flex-row justify-between items-center pt-14">
+      <Animated.View
+        entering={FadeIn.delay(200).duration(1000)}
+        className="w-full absolute flex-row justify-between items-center pt-14">
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           className="p-2 rounded-full bg-white ml-4">
@@ -85,13 +114,15 @@ export default function RecipeDetailScreen(props) {
             color={isFavorite ? 'red' : 'gray'}
           />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       {loading ? (
         <Loading size="large" />
       ) : (
         <View className="px-4 flex justify-between space-y-4 pt-8">
-          <View className="space-y-2">
+          <Animated.View
+            entering={FadeInDown.duration(700).springify().damping(12)}
+            className="space-y-2">
             <Text
               className="flex-1 font-bold text-neutral-700"
               style={{fontSize: hp(3)}}>
@@ -102,9 +133,14 @@ export default function RecipeDetailScreen(props) {
               style={{fontSize: hp(2)}}>
               {mealDetails?.strArea}
             </Text>
-          </View>
+          </Animated.View>
 
-          <View className="flex-row justify-around">
+          <Animated.View
+            entering={FadeInDown.delay(100)
+              .duration(700)
+              .springify()
+              .damping(12)}
+            className="flex-row justify-around">
             <View className="flex rounded-full bg-amber-300 p-2">
               <View
                 style={{width: hp(6.5), height: hp(6.5)}}
@@ -183,7 +219,81 @@ export default function RecipeDetailScreen(props) {
                 </Text>
               </View>
             </View>
-          </View>
+          </Animated.View>
+
+          {/* ingredients */}
+          <Animated.View
+            entering={FadeInDown.delay(200)
+              .duration(700)
+              .springify()
+              .damping(12)}
+            className="space-y-4">
+            <Text
+              style={{fontSize: hp(2.5)}}
+              className="font-bold flex-1 text-neutral-700">
+              Ingredients
+            </Text>
+            <View className="space-y-2">
+              {ingredientsIndexes(mealDetails).map(i => {
+                return (
+                  <View key={i} className="flex-row space-x-4">
+                    <View
+                      style={{height: hp(1.5), width: hp(1.5)}}
+                      className="bg-amber-300 rounded-full"
+                    />
+                    <View className="flex-row space-x-1">
+                      <Text
+                        style={{fontSize: hp(1.7)}}
+                        className="font-extrabold text-neutral-600">
+                        {mealDetails['strMeasure' + i]}
+                      </Text>
+                      <Text
+                        style={{fontSize: hp(1.7)}}
+                        className="font-medium text-neutral-600">
+                        {mealDetails['strIngredient' + i]}
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          </Animated.View>
+
+          {/* instructions */}
+          <Animated.View
+            entering={FadeInDown.delay(300)
+              .duration(700)
+              .springify()
+              .damping(12)}
+            className="space-y-4">
+            <Text
+              style={{fontSize: hp(2.5)}}
+              className="font-bold flex-1 text-neutral-700">
+              Instructions
+            </Text>
+            <Text className="text-neutral-700" style={{fontSize: hp(1.6)}}>
+              {mealDetails.strInstructions}
+            </Text>
+          </Animated.View>
+
+          {mealDetails?.strYoutube && (
+            <Animated.View
+              entering={FadeInDown.delay(400)
+                .duration(700)
+                .springify()
+                .damping(12)}
+              className="space-y-4">
+              <Text style={{fontSize: hp(2.5)}} className="flex-1 font-bold">
+                Recipe Video
+              </Text>
+              <View>
+                <YoutubeIframe
+                  videoId={extractYouTubeVideoId(mealDetails?.strYoutube)}
+                  height={hp(30)}
+                />
+              </View>
+            </Animated.View>
+          )}
         </View>
       )}
     </ScrollView>
