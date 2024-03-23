@@ -17,7 +17,7 @@ export default function Recipes({meals, categories}) {
         Recipes
       </Text>
 
-      {categories.length === 0 || meals.length === 0 ? (
+      {categories?.length === 0 || meals?.length === 0 ? (
         <Loading size="large" />
       ) : (
         <MasonryList

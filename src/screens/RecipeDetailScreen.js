@@ -119,7 +119,7 @@ export default function RecipeDetailScreen(props) {
       {loading ? (
         <Loading size="large" />
       ) : (
-        <View className="px-4 flex justify-between space-y-4 pt-8">
+        <View className="px-4 flex justify-between space-y-10 pt-8">
           <Animated.View
             entering={FadeInDown.duration(700).springify().damping(12)}
             className="space-y-2">
@@ -135,7 +135,7 @@ export default function RecipeDetailScreen(props) {
             </Text>
           </Animated.View>
 
-          <Animated.View
+          {/* <Animated.View
             entering={FadeInDown.delay(100)
               .duration(700)
               .springify()
@@ -219,7 +219,7 @@ export default function RecipeDetailScreen(props) {
                 </Text>
               </View>
             </View>
-          </Animated.View>
+          </Animated.View> */}
 
           {/* ingredients */}
           <Animated.View
@@ -233,23 +233,23 @@ export default function RecipeDetailScreen(props) {
               className="font-bold flex-1 text-neutral-700">
               Ingredients
             </Text>
-            <View className="space-y-2">
+            <View className="space-y-2 flex-row flex-wrap">
               {ingredientsIndexes(mealDetails).map(i => {
                 return (
                   <View key={i} className="flex-row space-x-4">
-                    <View
+                    {/* <View
                       style={{height: hp(1.5), width: hp(1.5)}}
                       className="bg-amber-300 rounded-full"
-                    />
-                    <View className="flex-row space-x-1">
+                    /> */}
+                    <View className="flex-row items-center m-1 bg-amber-300 px-3 py-2 rounded-md">
                       <Text
                         style={{fontSize: hp(1.7)}}
-                        className="font-extrabold text-neutral-600">
-                        {mealDetails['strMeasure' + i]}
+                        className="font-extrabold text-neutral-800">
+                        {mealDetails['strMeasure' + i]}{' '}
                       </Text>
                       <Text
                         style={{fontSize: hp(1.7)}}
-                        className="font-medium text-neutral-600">
+                        className="font-medium text-neutral-700">
                         {mealDetails['strIngredient' + i]}
                       </Text>
                     </View>
@@ -271,7 +271,7 @@ export default function RecipeDetailScreen(props) {
               className="font-bold flex-1 text-neutral-700">
               Instructions
             </Text>
-            <Text className="text-neutral-700" style={{fontSize: hp(1.6)}}>
+            <Text className="text-neutral-700" style={{fontSize: hp(1.8)}}>
               {mealDetails.strInstructions}
             </Text>
           </Animated.View>

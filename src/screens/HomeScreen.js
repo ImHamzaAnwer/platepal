@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
 import {StatusBar, Text, View, ScrollView, TextInput} from 'react-native';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
@@ -11,14 +9,17 @@ import {
 import Categories from '../components/categories';
 import axios from 'axios';
 import Recipes from '../components/recipes';
+import {debounce} from 'lodash';
 
 const HomeScreen = () => {
   const [activeCategory, setActiveCategory] = useState('Beef');
   const [meals, setMeals] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [mealInput, setMealInput] = useState('');
 
   useEffect(() => {
     getCategories();
+    // Fetch meals initially with default category 'Beef'
     getMeals();
   }, []);
 
@@ -48,10 +49,40 @@ const HomeScreen = () => {
     }
   };
 
+  const getMealsBySearch = async () => {
+    try {
+      const response = await axios.get(
+        `https://www.themealdb.com/api/json/v1/1/search.php?s=${mealInput}`,
+      );
+      if (response && response.data) {
+        setMeals(response.data.meals);
+      }
+    } catch (e) {
+      console.log(e, 'error fetching recipes');
+    }
+  };
+
+  const debouncedGetMealsBySearch = debounce(getMealsBySearch, 500); // 300ms delay
+
   const handleChangeCategory = category => {
-    getMeals(category);
     setActiveCategory(category);
-    setMeals([]);
+    setMealInput(''); // Clear search input when category changes
+    // Fetch meals only if search input is empty
+    if (!mealInput) {
+      getMeals(category);
+    }
+  };
+
+  // Function to handle search input change
+  const handleSearchInputChange = text => {
+    setMealInput(text);
+    if (text === '') {
+      // If input is empty, fetch meals based on active category
+      getMeals(activeCategory);
+    } else {
+      // If input is not empty, fetch meals by search
+      debouncedGetMealsBySearch();
+    }
   };
 
   return (
@@ -75,19 +106,21 @@ const HomeScreen = () => {
             <Text
               className="text-neutral-600 font-bold"
               style={{fontSize: hp(3.8)}}>
-              Make Your Own Food,
+              Savor the Flavor,
             </Text>
             <Text
               className="text-neutral-600 font-bold"
               style={{fontSize: hp(3.8)}}>
-              Stay at <Text className="text-amber-500">Home</Text>
+              Share the <Text className="text-amber-500">Love</Text>
             </Text>
           </View>
         </View>
 
         <View className="mx-4 flex-row items-center rounded-full bg-black/5 p-[6px]">
           <TextInput
-            placeholder="Search for receipes"
+            value={mealInput}
+            onChangeText={handleSearchInputChange}
+            placeholder="Search for recipes by name"
             placeholderTextColor={'gray'}
             style={{fontSize: hp(1.7)}}
             className="flex-1 text-base mb-2 pl-3 tracking-wider"
@@ -102,8 +135,9 @@ const HomeScreen = () => {
         </View>
 
         {/* Categories */}
+
         <View>
-          {categories.length > 0 && (
+          {mealInput.length === 0 && categories.length > 0 && (
             <Categories
               categories={categories}
               activeCategory={activeCategory}
