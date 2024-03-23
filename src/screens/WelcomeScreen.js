@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect} from 'react';
-import {StatusBar, Text, View} from 'react-native';
+import {Image, StatusBar, Text, View} from 'react-native';
 import {
   //   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -28,7 +28,10 @@ const WelcomeScreen = () => {
         <Animated.View
           className="bg-white/10 rounded-full"
           style={{padding: ring2Padding}}>
-          <Text style={{width: hp(20), height: hp(20)}}>asdasd</Text>
+          <Image
+            source={require('../images/logo.png')}
+            style={{width: hp(20), height: hp(20)}}
+          />
         </Animated.View>
       </Animated.View>
 
